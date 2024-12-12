@@ -1,0 +1,233 @@
+{% extends "salon/base.html" %}
+
+{% block content %}
+<style>
+    /* Animation Keyframes */
+    @keyframes float {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-15px) rotate(5deg); }
+    }
+
+    @keyframes sparkle {
+        0% { transform: scale(1) rotate(0deg); opacity: 1; }
+        50% { transform: scale(1.2) rotate(180deg); opacity: 0.8; }
+        100% { transform: scale(1) rotate(360deg); opacity: 1; }
+    }
+
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    @keyframes shine {
+        to {
+            background-position: 200% center;
+        }
+    }
+
+    /* Custom Styles */
+    .login-container {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #FFF0F5, #FFF5FE, #FFF0F5);
+        background-size: 400% 400%;
+        animation: gradient 15s ease infinite;
+    }
+
+    .login-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 192, 203, 0.3);
+        box-shadow: 
+            0 10px 25px rgba(255, 182, 193, 0.2),
+            0 0 0 1px rgba(255, 182, 193, 0.1);
+    }
+
+    .fancy-title {
+        background: linear-gradient(to right, #FF69B4, #FF1493, #FF69B4);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        background-size: 200% auto;
+        animation: shine 3s linear infinite;
+    }
+
+    .elegant-input {
+        width: 100%;
+        padding: 0.75rem 1.25rem;
+        border: 2px solid #FFE4E1;
+        border-radius: 1rem;
+        background: rgba(255, 255, 255, 0.9);
+        transition: all 0.3s ease;
+    }
+
+    .elegant-input:focus {
+        outline: none;
+        border-color: #FF69B4;
+        box-shadow: 0 0 15px rgba(255, 105, 180, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .sparkle-button {
+        background: linear-gradient(45deg, #FF69B4, #FF1493);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 1rem;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .sparkle-button::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 60%);
+        transform: rotate(45deg);
+        transition: all 0.3s ease;
+    }
+
+    .sparkle-button:hover::before {
+        transform: rotate(45deg) translate(50%, 50%);
+    }
+
+    .sparkle {
+        position: absolute;
+        pointer-events: none;
+        animation: sparkle 1.5s linear infinite;
+        opacity: 0.8;
+    }
+
+    .input-container {
+        position: relative;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #FF69B4;
+        transition: all 0.3s ease;
+    }
+</style>
+
+<div class="login-container flex items-center justify-center p-4">
+    <div class="login-card rounded-3xl p-8 md:p-10 w-full max-w-md relative">
+        <!-- Decorative Elements -->
+        <div class="absolute -top-6 -left-6 text-4xl animate-float delay-100">🌸</div>
+        <div class="absolute -top-6 -right-6 text-4xl animate-float delay-300">✨</div>
+        <div class="absolute -bottom-6 -left-6 text-4xl animate-float delay-500">💝</div>
+        <div class="absolute -bottom-6 -right-6 text-4xl animate-float delay-700">💖</div>
+        
+        <!-- Form Header -->
+        <div class="text-center mb-10">
+            <h1 class="fancy-title text-3xl font-bold mb-3">✨ Welcome Back! ✨</h1>
+            <p class="text-pink-400 font-medium">Sign in to your magical account</p>
+        </div>
+        
+        <!-- Login Form -->
+        <form method="post" class="space-y-8">
+            {% csrf_token %}
+            
+            <!-- Username Field -->
+            <div class="input-container group">
+                <label class="block text-gray-700 font-medium mb-2 ml-2">
+                    <span class="flex items-center">
+                        <i class="fas fa-user text-pink-400 mr-2"></i>
+                        Username
+                    </span>
+                </label>
+                <input type="text" 
+                       name="{{ form.username.name }}"
+                       class="elegant-input pl-10"
+                       placeholder="Enter your username"
+                       required>
+            </div>
+
+            <!-- Password Field -->
+            <div class="input-container group">
+                <label class="block text-gray-700 font-medium mb-2 ml-2">
+                    <span class="flex items-center">
+                        <i class="fas fa-lock text-pink-400 mr-2"></i>
+                        Password
+                    </span>
+                </label>
+                <input type="password"
+                       name="{{ form.password.name }}"
+                       class="elegant-input pl-10"
+                       placeholder="Enter your password"
+                       required>
+            </div>
+
+            <!-- Error Messages -->
+            {% if form.errors %}
+            <div class="bg-pink-50 p-4 rounded-xl border border-pink-200">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <p class="text-pink-600 text-sm flex items-center">
+                            <span class="mr-2">⚠️</span>
+                            {{ error }}
+                        </p>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Submit Button -->
+            <button type="submit" 
+                    class="sparkle-button w-full group hover:transform hover:scale-105 hover:shadow-lg transition-all duration-300">
+                <span class="relative z-10 flex items-center justify-center">
+                    <span class="mr-2">Sign In</span>
+                    <i class="fas fa-arrow-right transform group-hover:translate-x-1 transition-transform"></i>
+                </span>
+            </button>
+        </form>
+        
+        <!-- Additional Links -->
+        <div class="text-center mt-8">
+            <p class="text-gray-600">
+                Don't have an account? 
+                <a href="/register/" 
+                   class="text-pink-500 hover:text-pink-600 font-medium hover:underline inline-flex items-center group">
+                    Register here
+                    <span class="ml-1 transform group-hover:translate-x-1 transition-transform">✨</span>
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Create sparkle effect
+    function createSparkle() {
+        const sparkle = document.createElement('div');
+        sparkle.innerHTML = '✨';
+        sparkle.className = 'sparkle absolute';
+        sparkle.style.left = Math.random() * window.innerWidth + 'px';
+        sparkle.style.top = Math.random() * window.innerHeight + 'px';
+        document.body.appendChild(sparkle);
+        
+        setTimeout(() => {
+            sparkle.remove();
+        }, 1500);
+    }
+
+    // Add sparkles periodically
+    setInterval(createSparkle, 2000);
+
+    // Add input animations
+    document.querySelectorAll('.elegant-input').forEach(input => {
+        input.addEventListener('focus', function() {
+            this.closest('.input-container').classList.add('scale-105');
+        });
+
+        input.addEventListener('blur', function() {
+            this.closest('.input-container').classList.remove('scale-105');
+        });
+    });
+</script>
+{% endblock %}

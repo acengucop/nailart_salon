@@ -1,0 +1,233 @@
+{% extends "salon/base.html" %}
+
+{% block content %}
+<style>
+    .fade-in {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeIn 0.6s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .hover-scale {
+        transition: transform 0.3s ease;
+    }
+
+    .hover-scale:hover {
+        transform: scale(1.02);
+    }
+
+    .form-input-animation {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .form-input-animation::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(to right, #FF99CC, #FFB6C1);
+        transition: width 0.3s ease;
+    }
+
+    .form-input-animation:focus-within::after {
+        width: 100%;
+    }
+
+    .info-card {
+        transition: all 0.3s ease;
+        transform-origin: center;
+    }
+
+    .info-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(255, 105, 180, 0.15);
+    }
+
+    .info-card i {
+        transition: transform 0.3s ease;
+    }
+
+    .info-card:hover i {
+        transform: scale(1.1);
+    }
+
+    .available-slots {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 8px;
+    }
+
+    .available-slot {
+        padding: 6px 12px;
+        background-color: #FFF1F5;
+        color: #D81B60;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        text-align: center;
+        border: 1px solid #FF99CC;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .available-slot:hover {
+        background-color: #D81B60;
+        color: #fff;
+        cursor: pointer;
+    }
+
+</style>
+
+<div class="max-w-2xl mx-auto px-4 fade-in">
+    <!-- Header Section -->
+    <div class="text-center mb-12 space-y-3">
+        <h1 class="logo-text text-4xl mb-2 tracking-wide">Book Your Nail Session ✨</h1>
+        <p class="text-pink-600 font-medium text-lg opacity-90">Transform your nails into works of art</p>
+        <div class="w-20 h-1 bg-gradient-to-r from-pink-300 to-pink-500 mx-auto rounded-full"></div>
+    </div>
+
+    <!-- Booking Form -->
+    <form method="post" class="bg-white backdrop-blur-md bg-opacity-95 p-8 rounded-3xl shadow-xl border border-pink-100 hover-scale">
+        {% csrf_token %}
+        
+        <!-- Service Selection -->
+        <div class="mb-8 form-input-animation">
+            <label for="id_service" class="block text-gray-700 font-bold mb-3">
+                <span class="flex items-center text-lg">
+                    <i class="fas fa-paint-brush text-pink-500 mr-3"></i>
+                    Choose Your Service
+                </span>
+            </label>
+            <select name="service" id="id_service" 
+                    class="w-full p-4 border border-pink-200 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-300 transition-all duration-300 outline-none bg-pink-50/30"
+                    required>
+                <option value="">Select a service...</option>
+                {% for choice in form.service.field.choices %}
+                    {% if choice.0 %}
+                        <option value="{{ choice.0 }}" {% if form.service.value == choice.0 %}selected{% endif %}>
+                            {{ choice.1 }}
+                        </option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            {% if form.service.errors %}
+            <p class="text-red-500 text-sm mt-2 flex items-center animate-bounce">
+                <i class="fas fa-exclamation-circle mr-2"></i>
+                {{ form.service.errors.0 }}
+            </p>
+            {% endif %}
+        </div>
+        
+        <!-- Date and Time Selection -->
+        <div class="mb-8 form-input-animation">
+            <label for="id_date_time" class="block text-gray-700 font-bold mb-3">
+                <span class="flex items-center text-lg">
+                    <i class="far fa-calendar-alt text-pink-500 mr-3"></i>
+                    Select Date & Time
+                </span>
+            </label>
+            <input 
+                type="datetime-local" 
+                name="date_time" 
+                id="id_date_time" 
+                class="w-full p-4 border border-pink-200 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-300 transition-all duration-300 outline-none bg-pink-50/30" 
+                value="{% if form.date_time.value %}{{ form.date_time.value|date:'Y-m-d\TH:i' }}{% endif %}"
+                min="{{ min_date|date:'Y-m-d\TH:i' }}"
+                required
+            >
+            {% if form.date_time.errors %}
+            <p class="text-red-500 text-sm mt-2 flex items-center animate-bounce">
+                <i class="fas fa-exclamation-circle mr-2"></i>
+                {{ form.date_time.errors.0 }}
+            </p>
+            {% endif %}
+        </div>
+
+        <!-- Booked Slots -->
+        <div class="bg-pink-50/50 p-6 rounded-2xl mb-8 hover-scale">
+            <h3 class="text-lg font-bold text-pink-600 mb-3 flex items-center">
+                <i class="far fa-clock mr-2"></i>
+                Booked Slots
+            </h3>
+            <ul class="list-none space-y-2 text-gray-700 text-sm">
+                {% for appointment in booked_appointments %}
+                    <li class="flex items-center">
+                        <i class="fas fa-dot-circle text-pink-400 mr-2 text-xs"></i>
+                        {{ appointment.date_time|date:"D, M j, Y, g:i a" }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Available Slots -->
+        <div class="bg-green-50/50 p-6 rounded-2xl mb-8 hover-scale">
+            <h3 class="text-lg font-bold text-green-600 mb-3 flex items-center">
+                <i class="far fa-check-circle mr-2"></i>
+                Available Slots Today
+            </h3>
+            <div class="available-slots">
+                {% for slot in available_slots %}
+                    <div class="available-slot">{{ slot|date:"g:i a" }}</div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Submit Button -->
+        <div class="text-center">
+            <button type="submit" 
+                    class="button-fancy group relative inline-flex items-center justify-center px-8 py-4 text-lg rounded-full overflow-hidden">
+                <span class="relative z-10 flex items-center">
+                    <span class="mr-2">Book Appointment</span>
+                    <i class="fas fa-chevron-right transform group-hover:translate-x-1 transition-transform duration-300"></i>
+                </span>
+            </button>
+        </div>
+    </form>
+
+    <!-- Additional Information -->
+    <div class="mt-12 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="info-card p-6 bg-white bg-opacity-90 rounded-2xl shadow-md">
+                <i class="fas fa-clock text-pink-500 text-2xl mb-3"></i>
+                <h3 class="font-bold text-gray-700 mb-2">Duration</h3>
+                <p class="text-sm text-gray-600">45-60 minutes</p>
+            </div>
+            <div class="info-card p-6 bg-white bg-opacity-90 rounded-2xl shadow-md">
+                <i class="fas fa-ban text-pink-500 text-2xl mb-3"></i>
+                <h3 class="font-bold text-gray-700 mb-2">Cancellation</h3>
+                <p class="text-sm text-gray-600">Free up to 24h before</p>
+            </div>
+            <div class="info-card p-6 bg-white bg-opacity-90 rounded-2xl shadow-md">
+                <i class="fas fa-star text-pink-500 text-2xl mb-3"></i>
+                <h3 class="font-bold text-gray-700 mb-2">Premium Service</h3>
+                <p class="text-sm text-gray-600">Quality guaranteed</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Animate form elements on scroll
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('fade-in');
+            }
+        });
+    }, {
+        threshold: 0.1
+    });
+
+    document.querySelectorAll('.info-card').forEach(card => {
+        observer.observe(card);
+    });
+</script>
+{% endblock %}

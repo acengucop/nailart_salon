@@ -1,0 +1,81 @@
+{% extends "salon/base.html" %}
+{% block content %}
+<div class="container mx-auto px-6 py-12 max-w-lg">
+    <!-- Delete Confirmation Card -->
+    <div class="bg-white rounded-2xl shadow-xl p-8 border border-pink-100">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="w-20 h-20 bg-pink-50 rounded-full mx-auto flex items-center justify-center mb-4">
+                <i class="fas fa-calendar-times text-3xl text-pink-500"></i>
+            </div>
+            <h1 class="text-3xl font-bold logo-text mb-2">Delete Appointment</h1>
+            <p class="text-gray-600">Are you sure you want to delete this appointment?</p>
+        </div>
+
+        <!-- Warning Message -->
+        <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6 rounded-r">
+            <div class="flex items-center">
+                <i class="fas fa-exclamation-triangle text-red-400 mr-3"></i>
+                <p class="text-red-700">This action cannot be undone.</p>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <form method="post" class="flex flex-col gap-4">
+            {% csrf_token %}
+            <div class="flex justify-center gap-4">
+                <a href="{% url 'user_appointments' %}" 
+                   class="flex-1 bg-white border-2 border-pink-400 text-pink-600 py-3 px-6 rounded-full 
+                          hover:bg-pink-50 transition-all duration-300 transform hover:scale-105
+                          flex items-center justify-center">
+                    <i class="fas fa-times mr-2"></i>
+                    Cancel
+                </a>
+                <button type="submit" 
+                        class="flex-1 bg-gradient-to-r from-red-500 to-pink-500 text-white py-3 px-6 rounded-full
+                               hover:opacity-90 transition-all duration-300 transform hover:scale-105
+                               flex items-center justify-center shadow-lg">
+                    <i class="fas fa-trash-alt mr-2"></i>
+                    Delete
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Additional Message -->
+    <div class="text-center mt-6 text-gray-500 text-sm">
+        <p>Need to reschedule instead? <a href="{% url 'appointment_new' %}" class="text-pink-500 hover:underline">Book a new appointment</a></p>
+    </div>
+</div>
+
+<style>
+    .logo-text {
+        background: linear-gradient(45deg, #FF1493, #FF69B4);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* Button hover animations */
+    button:hover, a:hover {
+        transition: all 0.3s ease;
+    }
+
+    /* Card animation */
+    .bg-white {
+        animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}

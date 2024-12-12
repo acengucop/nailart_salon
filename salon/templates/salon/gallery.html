@@ -1,0 +1,132 @@
+{% extends "salon/base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-12">
+    <!-- Header Section -->
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold logo-text mb-4">✨ Nail Art Gallery ✨</h1>
+        <p class="text-pink-600 text-lg">Discover our stunning nail art creations</p>
+    </div>
+
+    <!-- Gallery Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for design in object_list %}
+        <div class="gallery-item bg-white rounded-2xl shadow-xl overflow-hidden transform hover:-translate-y-2 transition-all duration-300">
+            <!-- Image Container -->
+            <div class="relative overflow-hidden group">
+                <img
+                    src="{{ design.image.url }}"
+                    alt="{{ design.title }}"
+                    class="w-full h-64 object-cover transmedia/designs/DALL·E 2024-12-12 02.11.03 - A detailed and colorful illustration of a nail art artist designing intricate duck-themed nail patterns. The artist is focused, with their tools like .webpition-transform duration-500 group-hover:scale-110"
+                />
+                <!-- Overlay -->
+                <div class="absolute inset-0 bg-gradient-to-t from-pink-500/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                    <div class="p-4 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                        <h3 class="text-xl font-bold mb-2">{{ design.title }}</h3>
+                        <p class="text-sm">{{ design.description }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Section -->
+            <div class="p-6 bg-white">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">{{ design.title }}</h3>
+                        <p class="text-gray-600 text-sm line-clamp-2">{{ design.description }}</p>
+                    </div>
+                    <div class="bg-pink-100 p-2 rounded-full">
+                        <i class="fas fa-heart text-pink-500"></i>
+                    </div>
+                </div>
+                
+                <!-- Tags or Categories -->
+                <div class="mt-4 flex flex-wrap gap-2">
+                    <span class="px-3 py-1 bg-pink-100 text-pink-600 rounded-full text-xs">
+                        Trending
+                    </span>
+                    <span class="px-3 py-1 bg-purple-100 text-purple-600 rounded-full text-xs">
+                        2024 Style
+                    </span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .logo-text {
+        background: linear-gradient(45deg, #FF1493, #FF69B4);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .gallery-item {
+        animation: fadeIn 0.6s ease-out backwards;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Fixed stagger animation for gallery items */
+    .gallery-item:nth-child(1) { animation-delay: 0.1s; }
+    .gallery-item:nth-child(2) { animation-delay: 0.2s; }
+    .gallery-item:nth-child(3) { animation-delay: 0.3s; }
+    .gallery-item:nth-child(4) { animation-delay: 0.4s; }
+    .gallery-item:nth-child(5) { animation-delay: 0.5s; }
+    .gallery-item:nth-child(6) { animation-delay: 0.6s; }
+    .gallery-item:nth-child(7) { animation-delay: 0.7s; }
+    .gallery-item:nth-child(8) { animation-delay: 0.8s; }
+    .gallery-item:nth-child(9) { animation-delay: 0.9s; }
+    .gallery-item:nth-child(n+10) { animation-delay: 1s; }
+
+    /* Shimmer effect for headings */
+    .logo-text {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .logo-text::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.3),
+            transparent
+        );
+        animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+        100% {
+            left: 200%;
+        }
+    }
+
+    /* Hover animations for gallery items */
+    .gallery-item {
+        transition: all 0.3s ease;
+    }
+
+    .gallery-item:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+</style>
+{% endblock %}

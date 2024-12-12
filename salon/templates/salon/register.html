@@ -1,0 +1,225 @@
+{% extends "salon/base.html" %}
+
+{% block content %}
+<style>
+    /* Animation Keyframes */
+    @keyframes sparkle {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-15px) rotate(5deg); }
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    @keyframes rainbow-text {
+        0% { color: #FF69B4; }
+        25% { color: #FF1493; }
+        50% { color: #FF69B4; }
+        75% { color: #FFB6C1; }
+        100% { color: #FF69B4; }
+    }
+
+    /* Base Styles */
+    .registration-container {
+        min-height: 100vh;
+        padding: 2rem;
+        background-image: linear-gradient(135deg, #FFF5F6 0%, #FFE4E8 100%);
+    }
+
+    .registration-card {
+        background: white;
+        padding: 2.5rem;
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 25px rgba(255, 182, 193, 0.2);
+        max-width: 28rem;
+        width: 100%;
+        position: relative;
+        margin: 1rem auto;
+    }
+
+    /* Decorative Elements */
+    .floating-emoji {
+        position: absolute;
+        font-size: 2rem;
+        animation: float 3s ease-in-out infinite;
+        z-index: 1;
+    }
+
+    .sparkly-text {
+        animation: rainbow-text 2s linear infinite;
+        text-shadow: 0 0 5px rgba(255, 105, 180, 0.5);
+    }
+
+    /* Form Elements */
+    .input-container {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: -2rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.2rem;
+    }
+
+    .cute-input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #FFB6C1;
+        border-radius: 1rem;
+        background-color: #FFF5F6;
+        transition: all 0.3s ease;
+    }
+
+    .cute-input:focus {
+        outline: none;
+        border-color: #FF69B4;
+        box-shadow: 0 0 10px rgba(255, 105, 180, 0.2);
+        transform: scale(1.01);
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+
+    /* Button Styles */
+    .cute-button {
+        background: linear-gradient(45deg, #FF69B4, #FFB6C1);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 1rem;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .cute-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3);
+    }
+
+    /* Helper Classes */
+    .text-helper {
+        font-size: 0.875rem;
+        color: #666;
+        margin-top: 0.5rem;
+    }
+
+    .error-container {
+        background-color: #FFF5F6;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .error-message {
+        color: #FF1493;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+</style>
+
+<div class="registration-container flex items-center justify-center">
+    <div class="registration-card">
+        <!-- Decorative Emojis -->
+        <div class="floating-emoji" style="top: -1rem; left: -1rem; animation-delay: 0s;">🌸</div>
+        <div class="floating-emoji" style="top: -1rem; right: -1rem; animation-delay: 0.5s;">✨</div>
+        <div class="floating-emoji" style="bottom: -1rem; left: -1rem; animation-delay: 1s;">🎀</div>
+        <div class="floating-emoji" style="bottom: -1rem; right: -1rem; animation-delay: 1.5s;">💝</div>
+
+        <!-- Form Header -->
+        <h1 class="text-3xl font-bold text-center mb-8 sparkly-text">
+            ✨ Daftar Yuk! ✨
+        </h1>
+        
+        <!-- Registration Form -->
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Username Field -->
+            <div class="input-container">
+                <span class="input-icon">👤</span>
+                <label class="form-label sparkly-text">Nama Pengguna</label>
+                <input type="text" 
+                       name="{{ form.username.name }}" 
+                       class="cute-input" 
+                       id="{{ form.username.id_for_label }}"
+                       {% if form.username.value %}value="{{ form.username.value }}"{% endif %}
+                       required>
+                <p class="text-helper">✏️ Maksimal 150 karakter ya~</p>
+            </div>
+
+            <!-- Password Field -->
+            <div class="input-container">
+                <span class="input-icon">🔐</span>
+                <label class="form-label sparkly-text">Kata Sandi</label>
+                <input type="password" 
+                       name="{{ form.password1.name }}" 
+                       class="cute-input" 
+                       id="{{ form.password1.id_for_label }}"
+                       required>
+                <ul class="text-helper space-y-1 mt-2">
+                    <li>🌟 Minimal 8 karakter</li>
+                    <li>🎈 Kombinasi huruf & angka</li>
+                    <li>🔒 Buat yang unik ya!</li>
+                </ul>
+            </div>
+
+            <!-- Password Confirmation -->
+            <div class="input-container">
+                <span class="input-icon">✅</span>
+                <label class="form-label sparkly-text">Konfirmasi Kata Sandi</label>
+                <input type="password" 
+                       name="{{ form.password2.name }}" 
+                       class="cute-input" 
+                       id="{{ form.password2.id_for_label }}"
+                       required>
+                <p class="text-helper">🎯 Ketik ulang kata sandi yang sama</p>
+            </div>
+
+            <!-- Error Messages -->
+            {% if form.errors %}
+            <div class="error-container">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                    <p class="error-message">
+                        <span class="mr-2">⚠️</span>
+                        {{ error }}
+                    </p>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Submit Button -->
+            <button type="submit" class="cute-button font-medium text-lg">
+                ✨ Daftar Sekarang! ✨
+            </button>
+        </form>
+
+        <!-- Login Link -->
+        <div class="text-center mt-8">
+            <p class="text-gray-600">
+                Sudah punya akun? 
+                <a href="/login/" 
+                   class="text-pink-500 hover:text-pink-600 font-medium hover:underline inline-flex items-center">
+                    Login di sini! 
+                    <span class="ml-1 animate-bounce">💖</span>
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

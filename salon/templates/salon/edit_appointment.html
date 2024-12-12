@@ -1,0 +1,149 @@
+{% extends "salon/base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-12 max-w-2xl">
+    <div class="bg-gradient-to-r from-pink-300 via-pink-200 to-pink-100 p-8 rounded-3xl shadow-lg relative overflow-hidden">
+        <h1 class="text-4xl font-bold text-center mb-8 logo-text">✨ Edit Appointment ✨</h1>
+
+        <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Service Selection -->
+                <div class="bg-pink-50 rounded-xl p-6">
+                    <label for="id_service" class="block text-gray-700 font-medium mb-2 flex items-center">
+                        <i class="fas fa-paint-brush text-pink-500 mr-3"></i>
+                        Choose Your Service
+                    </label>
+                    <select name="service" id="id_service" class="select-custom w-full p-3 bg-white border border-pink-200 rounded-xl transition-all duration-300 outline-none">
+                        <option value="">Select a service...</option>
+                        {% for choice in form.service.field.choices %}
+                            {% if choice.0 %}
+                                <option value="{{ choice.0 }}" {% if form.service.value == choice.0 %}selected{% endif %}>
+                                    {{ choice.1 }}
+                                </option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    {% if form.service.errors %}
+                    <p class="text-red-500 text-sm mt-2 flex items-center">
+                        <i class="fas fa-exclamation-circle mr-1"></i>
+                        {{ form.service.errors.0 }}
+                    </p>
+                    {% endif %}
+                </div>
+
+                <!-- Date and Time Selection -->
+                <div class="bg-pink-50 rounded-xl p-6">
+                    <label for="id_date_time" class="block text-gray-700 font-medium mb-2 flex items-center">
+                        <i class="far fa-calendar-alt text-pink-500 mr-3"></i>
+                        Select Date & Time
+                    </label>
+                    <input type="datetime-local" 
+                           name="date_time" 
+                           id="id_date_time"
+                           class="w-full p-3 bg-white border border-pink-200 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-300 transition-all duration-300 outline-none" 
+                           value="{% if form.date_time.value %}{{ form.date_time.value|date:'Y-m-d\TH:i' }}{% endif %}"
+                           required>
+                    {% if form.date_time.errors %}
+                    <p class="text-red-500 text-sm mt-2 flex items-center">
+                        <i class="fas fa-exclamation-circle mr-1"></i>
+                        {{ form.date_time.errors.0 }}
+                    </p>
+                    {% endif %}
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 mt-8">
+                    <button type="submit" class="flex-1 button-fancy">
+                        <i class="fas fa-save mr-2"></i>
+                        Save Changes
+                    </button>
+                    <a href="{% url 'user_appointments' %}" class="flex-1 button-cancel">
+                        <i class="fas fa-times mr-2"></i>
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .logo-text {
+        background: linear-gradient(45deg, #FF1493, #FF69B4);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .select-custom {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FF69B4'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.5rem center;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+    }
+
+    .button-fancy {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(45deg, #FF69B4, #FFB6C1);
+        color: white;
+        border-radius: 9999px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+    }
+    
+    .button-fancy:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 105, 180, 0.4);
+    }
+
+    .button-cancel {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem 1.5rem;
+        background: white;
+        color: #FF69B4;
+        border: 2px solid #FF69B4;
+        border-radius: 9999px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .button-cancel:hover {
+        background: #FFF5F7;
+        transform: translateY(-2px);
+    }
+
+    /* Form field focus styles */
+    input:focus, select:focus {
+        outline: none;
+        border-color: #FF69B4;
+        box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.2);
+    }
+
+    /* Card animation */
+    .container > div:first-child {
+        animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}

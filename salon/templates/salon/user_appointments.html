@@ -1,0 +1,220 @@
+{% extends "salon/base.html" %}
+{% block content %}
+<div class="container mx-auto px-6 py-12">
+    <!-- Header Section -->
+    <div class="text-center mb-12 animate-float">
+        <h1 class="text-4xl font-bold logo-text mb-4">✨ Your Beauty Journey ✨</h1>
+        <p class="text-pink-600">Track and manage your nail appointments</p>
+    </div>
+
+    {% if appointments %}
+    <!-- Appointments Grid -->
+    <div class="grid gap-6 animate-stagger-fade">
+        {% for appointment in appointments %}
+        <div class="appointment-card bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-[1.02] transition-all duration-300">
+            <div class="relative">
+                <!-- Status Indicator -->
+                <div class="absolute top-4 right-4">
+                    <span class="status-badge px-4 py-1 rounded-full text-sm font-medium
+                        {% if appointment.status == 'Pending' %}bg-yellow-100 text-yellow-700
+                        {% elif appointment.status == 'Confirmed' %}bg-green-100 text-green-700
+                        {% elif appointment.status == 'Completed' %}bg-blue-100 text-blue-700
+                        {% else %}bg-gray-100 text-gray-700{% endif %}">
+                        {{ appointment.status }}
+                    </span>
+                </div>
+
+                <!-- Appointment Content -->
+                <div class="p-6 grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
+                    <!-- Service Info -->
+                    <div class="md:col-span-1 flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-spa text-pink-500"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">{{ appointment.service.name }}</h3>
+                        </div>
+                    </div>
+
+                    <!-- Date & Time -->
+                    <div class="md:col-span-2 flex items-center justify-center space-x-3">
+                        <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                            <i class="far fa-calendar-alt text-purple-500"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-600">{{ appointment.date_time|date:"l, F j, Y" }}</p>
+                            <p class="text-sm text-gray-500">{{ appointment.date_time|date:"g:i A" }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="md:col-span-1 flex justify-end space-x-3">
+                        <a href="{% url 'edit_appointment' appointment.id %}" 
+                           class="action-button edit-button">
+                            <i class="fas fa-edit mr-2"></i>
+                            Edit
+                        </a>
+                        <a href="{% url 'delete_appointment' appointment.id %}" 
+                           class="action-button delete-button">
+                            <i class="fas fa-trash-alt mr-2"></i>
+                            Delete
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 progress-bar"></div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="text-center py-16 animate-float">
+        <div class="w-24 h-24 mx-auto mb-6 bg-pink-100 rounded-full flex items-center justify-center">
+            <i class="fas fa-calendar-plus text-4xl text-pink-500"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">No Appointments Yet!</h3>
+        <p class="text-gray-600 mb-6">Ready to start your beauty journey?</p>
+        <a href="{% url 'appointment_new' %}" 
+           class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full hover:from-pink-600 hover:to-purple-600 transform hover:scale-105 transition-all duration-300">
+            <i class="fas fa-plus mr-2"></i>
+            Book Your First Appointment
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    /* Logo Text Styling */
+    .logo-text {
+        background: linear-gradient(45deg, #FF1493, #FF69B4);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* Action Buttons */
+    .action-button {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .edit-button {
+        background: #F0F9FF;
+        color: #0284C7;
+    }
+
+    .edit-button:hover {
+        background: #E0F2FE;
+        transform: translateY(-2px);
+    }
+
+    .delete-button {
+        background: #FEE2E2;
+        color: #DC2626;
+    }
+
+    .delete-button:hover {
+        background: #FEE2E2;
+        transform: translateY(-2px);
+    }
+
+    /* Progress Bar Animation */
+    .progress-bar {
+        background-size: 200% 200%;
+        animation: shimmer 2s linear infinite;
+    }
+
+    @keyframes shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+
+    /* Float Animation */
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+
+    /* Stagger Fade Animation */
+    .animate-stagger-fade > * {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: staggerFade 0.5s ease-out forwards;
+    }
+
+    @keyframes staggerFade {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Manual Stagger Delays */
+    .animate-stagger-fade > *:nth-child(1) { animation-delay: 0.1s; }
+    .animate-stagger-fade > *:nth-child(2) { animation-delay: 0.2s; }
+    .animate-stagger-fade > *:nth-child(3) { animation-delay: 0.3s; }
+    .animate-stagger-fade > *:nth-child(4) { animation-delay: 0.4s; }
+    .animate-stagger-fade > *:nth-child(5) { animation-delay: 0.5s; }
+    .animate-stagger-fade > *:nth-child(6) { animation-delay: 0.6s; }
+    .animate-stagger-fade > *:nth-child(7) { animation-delay: 0.7s; }
+    .animate-stagger-fade > *:nth-child(8) { animation-delay: 0.8s; }
+    .animate-stagger-fade > *:nth-child(9) { animation-delay: 0.9s; }
+    .animate-stagger-fade > *:nth-child(n+10) { animation-delay: 1s; }
+
+    /* Card Hover Effect */
+    .appointment-card {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .appointment-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+            circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+            rgba(255, 182, 193, 0.1) 0%,
+            transparent 50%
+        );
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+    }
+
+    .appointment-card:hover::before {
+        opacity: 1;
+    }
+</style>
+
+<script>
+    // Mouse tracking for card hover effect
+    document.querySelectorAll('.appointment-card').forEach(card => {
+        card.addEventListener('mousemove', e => {
+            const rect = card.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / card.clientWidth) * 100;
+            const y = ((e.clientY - rect.top) / card.clientHeight) * 100;
+            card.style.setProperty('--mouse-x', `${x}%`);
+            card.style.setProperty('--mouse-y', `${y}%`);
+        });
+    });
+</script>
+{% endblock %}
