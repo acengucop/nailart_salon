@@ -43,7 +43,7 @@
                            name="date_time" 
                            id="id_date_time"
                            class="w-full p-3 bg-white border border-pink-200 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-300 transition-all duration-300 outline-none" 
-                           value="{% if form.date_time.value %}{{ form.date_time.value|date:'Y-m-d\TH:i' }}{% endif %}"
+                           value="{% if form.date_time.value %}{{ form.date_time.value|date:'Y-m-d\\TH:i' }}{% endif %}"
                            required>
                     {% if form.date_time.errors %}
                     <p class="text-red-500 text-sm mt-2 flex items-center">
@@ -123,14 +123,12 @@
         transform: translateY(-2px);
     }
 
-    /* Form field focus styles */
     input:focus, select:focus {
         outline: none;
         border-color: #FF69B4;
         box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.2);
     }
 
-    /* Card animation */
     .container > div:first-child {
         animation: slideIn 0.5s ease-out;
     }

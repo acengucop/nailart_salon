@@ -1,0 +1,36 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div class="dashboard">
+    <h1>Welcome to Admin Panel</h1>
+    <div class="stats">
+        <div class="stat-item">
+            <h3>Total Revenue</h3>
+            <p>{{ total_income }} USD</p>
+        </div>
+        <div class="stat-item">
+            <h3>Total Appointments</h3>
+            <p>{{ total_appointments }}</p>
+        </div>
+    </div>
+</div>
+<style>
+    .dashboard {
+        margin: 20px;
+        padding: 20px;
+        background: #fff;
+        border-radius: 10px;
+    }
+    .stats {
+        display: flex;
+        justify-content: space-between;
+    }
+    .stat-item {
+        padding: 10px;
+        border-radius: 5px;
+        background: #f1f1f1;
+        width: 30%;
+        text-align: center;
+    }
+</style>
+{% endblock %}

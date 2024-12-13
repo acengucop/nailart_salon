@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'salon'
+    'salon',  # Your application
 ]
 
 MIDDLEWARE = [
@@ -110,32 +111,28 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
+# settings.py
+TIME_ZONE = 'Asia/Jakarta'
 USE_TZ = True
+USE_L10N = True
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
-
-LOGIN_REDIRECT_URL = '/profile/'  # Mengarahkan ke halaman profil setelah login
-
-
-import os
-
-# Static files
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'salon/static')]
+STATICFILES_DIRS = [
+    BASE_DIR / 'salon/static',
+]
 
 # Media files
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = BASE_DIR / 'media'
 
 
+# Authentication settings
+LOGIN_REDIRECT_URL = '/profile/'  # Redirect to profile after login
+LOGOUT_REDIRECT_URL = '/'  # Redirect to homepage after logout
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

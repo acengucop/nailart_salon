@@ -84,6 +84,31 @@
         cursor: pointer;
     }
 
+    .past-slot {
+        opacity: 0.4;
+        pointer-events: none;
+        background-color: #f8d7da;
+        color: #a0a0a0;
+    }
+
+    .payment-section {
+        background-color: #FFF7F9;
+        border: 1px solid #FFD1DC;
+        border-radius: 10px;
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    .payment-section h3 {
+        color: #D81B60;
+        font-size: 1.25rem;
+        margin-bottom: 8px;
+    }
+
+    .payment-section p {
+        color: #555;
+        font-size: 0.9rem;
+    }
 </style>
 
 <div class="max-w-2xl mx-auto px-4 fade-in">
@@ -97,7 +122,7 @@
     <!-- Booking Form -->
     <form method="post" class="bg-white backdrop-blur-md bg-opacity-95 p-8 rounded-3xl shadow-xl border border-pink-100 hover-scale">
         {% csrf_token %}
-        
+
         <!-- Service Selection -->
         <div class="mb-8 form-input-animation">
             <label for="id_service" class="block text-gray-700 font-bold mb-3">
@@ -125,7 +150,7 @@
             </p>
             {% endif %}
         </div>
-        
+
         <!-- Date and Time Selection -->
         <div class="mb-8 form-input-animation">
             <label for="id_date_time" class="block text-gray-700 font-bold mb-3">
@@ -135,14 +160,15 @@
                 </span>
             </label>
             <input 
-                type="datetime-local" 
-                name="date_time" 
-                id="id_date_time" 
-                class="w-full p-4 border border-pink-200 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-300 transition-all duration-300 outline-none bg-pink-50/30" 
-                value="{% if form.date_time.value %}{{ form.date_time.value|date:'Y-m-d\TH:i' }}{% endif %}"
-                min="{{ min_date|date:'Y-m-d\TH:i' }}"
-                required
-            >
+            type="datetime-local" 
+            name="date_time" 
+            id="id_date_time" 
+            class="w-full p-4 border border-pink-200 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-300 transition-all duration-300 outline-none bg-pink-50/30" 
+            value="{% if form.date_time.value %}{{ form.date_time.value|date:'Y-m-d\TH:i' }}{% endif %}"
+            min="{{ min_date|date:'Y-m-d\TH:i' }}"
+            required
+        >
+        
             {% if form.date_time.errors %}
             <p class="text-red-500 text-sm mt-2 flex items-center animate-bounce">
                 <i class="fas fa-exclamation-circle mr-2"></i>
@@ -161,25 +187,62 @@
                 {% for appointment in booked_appointments %}
                     <li class="flex items-center">
                         <i class="fas fa-dot-circle text-pink-400 mr-2 text-xs"></i>
-                        {{ appointment.date_time|date:"D, M j, Y, g:i a" }}
+                        {{ appointment.date_time|date:"D, d M Y, H:i" }}
                     </li>
                 {% endfor %}
             </ul>
         </div>
 
         <!-- Available Slots -->
-        <div class="bg-green-50/50 p-6 rounded-2xl mb-8 hover-scale">
-            <h3 class="text-lg font-bold text-green-600 mb-3 flex items-center">
-                <i class="far fa-check-circle mr-2"></i>
-                Available Slots Today
-            </h3>
-            <div class="available-slots">
-                {% for slot in available_slots %}
-                    <div class="available-slot">{{ slot|date:"g:i a" }}</div>
-                {% endfor %}
-            </div>
-        </div>
+<!-- Available Slots -->
+<!-- Available Slots -->
+<div class="bg-green-50/50 p-6 rounded-2xl mb-8 hover-scale">
+    <h3 class="text-lg font-bold text-green-600 mb-3 flex items-center">
+        <i class="far fa-check-circle mr-2"></i>
+        Available Slots Today
+    </h3>
+    <div class="available-slots">
+        {% for slot in available_slots %}
+            <div class="available-slot">{{ slot|date:"H:i" }}</div>
+        {% empty %}
+            <p class="text-gray-500">No available slots for today.</p>
+        {% endfor %}
+    </div>
+</div>
+
         
+        
+
+        <!-- Payment Section -->
+        <div class="payment-section">
+            <h3>Payment Information</h3>
+            <p>The minimum payment for booking is <strong>30% of the service price</strong>. Please confirm your payment to complete the booking.</p>
+        </div>
+
+        <div class="mb-6 form-input-animation">
+            <label for="id_payment_amount" class="block text-gray-700 font-bold mb-3">
+                <span class="flex items-center text-lg">
+                    <i class="fas fa-money-bill-wave text-pink-500 mr-3"></i>
+                    Payment Amount
+                </span>
+            </label>
+            <input 
+                type="number" 
+                name="payment_amount" 
+                id="id_payment_amount" 
+                step="0.01" 
+                min="0"
+                class="w-full p-4 border border-pink-200 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-300 transition-all duration-300 outline-none bg-pink-50/30" 
+                required
+            >
+            {% if form.payment_amount.errors %}
+            <p class="text-red-500 text-sm mt-2 flex items-center animate-bounce">
+                <i class="fas fa-exclamation-circle mr-2"></i>
+                {{ form.payment_amount.errors.0 }}
+            </p>
+            {% endif %}
+        </div>
+
         <!-- Submit Button -->
         <div class="text-center">
             <button type="submit" 
