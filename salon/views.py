@@ -102,10 +102,22 @@ class AppointmentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView)
         return self.request.user == self.get_object().user
 
     def form_valid(self, form):
-        if Appointment.objects.filter(date_time=form.instance.date_time).exclude(pk=self.object.pk).exists():
+        # Validasi waktu pemesanan dalam jam operasional
+        date_time = form.instance.date_time
+        opening_time = date_time.replace(hour=10, minute=0, second=0, microsecond=0)
+        closing_time = date_time.replace(hour=22, minute=0, second=0, microsecond=0)
+
+        if date_time < opening_time or date_time >= closing_time:
+            form.add_error('date_time', "The selected time is outside of salon operating hours (10:00 AM - 10:00 PM).")
+            return self.form_invalid(form)
+
+        # Validasi apakah waktu sudah dipesan
+        if Appointment.objects.filter(date_time=date_time).exclude(pk=self.object.pk).exists():
             form.add_error('date_time', "This time slot is already booked. Please choose a different time.")
             return self.form_invalid(form)
+
         return super().form_valid(form)
+
 
 
 class AppointmentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
