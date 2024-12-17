@@ -2,53 +2,115 @@
 
 {% block content %}
 <div class="container mx-auto px-6 py-12">
-    <!-- Header Section -->
-    <div class="text-center mb-12">
-        <h1 class="text-4xl font-bold logo-text mb-4">✨ Nail Art Gallery ✨</h1>
-        <p class="text-pink-600 text-lg">Discover our stunning nail art creations</p>
+    <!-- Animated Header Section with Sparkles -->
+    <div class="text-center mb-12 relative sparkle-container">
+        <h1 class="text-5xl font-bold logo-text mb-4 animate-float">✨ Nail Art Gallery ✨</h1>
+        <p class="text-pink-600 text-lg fancy-text animate-fade-in">Where Dreams Meet Fingertips</p>
+        <!-- Floating decorative elements -->
+        <div class="absolute top-0 left-0 w-full h-full pointer-events-none">
+            <div class="floating-sparkle">💅</div>
+            <div class="floating-sparkle delay-2">✨</div>
+            <div class="floating-sparkle delay-4">💖</div>
+        </div>
     </div>
 
-    <!-- Gallery Grid -->
+    <!-- Animated Filter Buttons -->
+    <div class="flex justify-center gap-4 mb-8 filter-container">
+        <button class="filter-btn active">All</button>
+        <button class="filter-btn">Trendy</button>
+        <button class="filter-btn">Classic</button>
+        <button class="filter-btn">Artistic</button>
+    </div>
+
+    <!-- Enhanced Gallery Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {% for design in object_list %}
-        <div class="gallery-item bg-white rounded-2xl shadow-xl overflow-hidden transform hover:-translate-y-2 transition-all duration-300">
-            <!-- Image Container -->
+        <div class="gallery-item bg-white rounded-2xl shadow-xl overflow-hidden transform hover:-translate-y-2 transition-all duration-500 hover:shadow-2xl">
+            <!-- Image Container with Enhanced Hover Effects -->
             <div class="relative overflow-hidden group">
                 <img
                     src="{{ design.image.url }}"
                     alt="{{ design.title }}"
-                    class="w-full h-64 object-cover transmedia/designs/DALL·E 2024-12-12 02.11.03 - A detailed and colorful illustration of a nail art artist designing intricate duck-themed nail patterns. The artist is focused, with their tools like .webpition-transform duration-500 group-hover:scale-110"
+                    class="w-full h-72 object-cover transition-transform duration-700 group-hover:scale-110"
                 />
-                <!-- Overlay -->
-                <div class="absolute inset-0 bg-gradient-to-t from-pink-500/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                    <div class="p-4 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                        <h3 class="text-xl font-bold mb-2">{{ design.title }}</h3>
-                        <p class="text-sm">{{ design.description }}</p>
+                <!-- Elegant Overlay with Gradient -->
+                <div class="absolute inset-0 bg-gradient-to-t from-pink-500/80 via-pink-400/50 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500">
+                    <div class="absolute bottom-0 left-0 right-0 p-6 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+                        <h3 class="text-2xl font-bold text-white mb-2 fancy-text">{{ design.title }}</h3>
+                        <p class="text-white/90">{{ design.description }}</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Info Section -->
+            <!-- Enhanced Info Section -->
             <div class="p-6 bg-white">
                 <div class="flex justify-between items-start">
                     <div>
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">{{ design.title }}</h3>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2 hover:text-pink-500 transition-colors">{{ design.title }}</h3>
                         <p class="text-gray-600 text-sm line-clamp-2">{{ design.description }}</p>
                     </div>
-                    <div class="bg-pink-100 p-2 rounded-full">
-                        <i class="fas fa-heart text-pink-500"></i>
+                    <div class="heart-btn">
+                        <i class="fas fa-heart"></i>
                     </div>
                 </div>
                 
-                <!-- Tags or Categories -->
+                <!-- Animated Tags -->
                 <div class="mt-4 flex flex-wrap gap-2">
-                    <span class="px-3 py-1 bg-pink-100 text-pink-600 rounded-full text-xs">
-                        Trending
+                    <span class="tag">
+                        <i class="fas fa-star mr-1"></i>Trending
                     </span>
-                    <span class="px-3 py-1 bg-purple-100 text-purple-600 rounded-full text-xs">
-                        2024 Style
+                    <span class="tag">
+                        <i class="fas fa-sparkles mr-1"></i>2024 Style
                     </span>
                 </div>
+            </div>
+
+            <!-- Elegant Comments Section -->
+            <div class="bg-gray-50 p-6 rounded-b-2xl">
+                <h4 class="text-lg font-semibold text-gray-800 mb-3 fancy-text">
+                    <i class="fas fa-comments mr-2 text-pink-500"></i>Comments
+                </h4>
+                <div class="comments-container">
+                    {% for comment in design.comments.all %}
+                    <div class="comment-item">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-full bg-pink-200 flex items-center justify-center">
+                                <span class="text-pink-500 font-bold">{{ comment.user.username|first }}</span>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm text-gray-700">
+                                    <span class="font-semibold">{{ comment.user.username }}</span>
+                                    {{ comment.comment }}
+                                </p>
+                                <span class="text-xs text-gray-400">{{ comment.created_at|date:"M d, Y H:i" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-sm text-gray-500 italic">Be the first to share your thoughts! ✨</p>
+                    {% endfor %}
+                </div>
+
+                <!-- Elegant Comment Form -->
+                {% if user.is_authenticated %}
+                <form method="POST" class="mt-4 comment-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="gallery_id" value="{{ design.id }}">
+                    <div class="relative">
+                        {{ comment_form.comment }}
+                        <button type="submit" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-pink-500 hover:text-pink-600">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
+                {% else %}
+                <p class="text-sm text-gray-500 mt-2">
+                    <a href="{% url 'login' %}" class="text-pink-600 hover:text-pink-700 transition-colors">
+                        <i class="fas fa-lock mr-1"></i>Log in
+                    </a> 
+                    to join the conversation
+                </p>
+                {% endif %}
             </div>
         </div>
         {% endfor %}
@@ -56,19 +118,121 @@
 </div>
 
 <style>
-    .logo-text {
+    /* Elegant Typography */
+    .fancy-text {
+        font-family: 'Quicksand', sans-serif;
+        letter-spacing: 0.5px;
+    }
+
+    /* Floating Animation for Header */
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .animate-float {
+        animation: float 3s ease-in-out infinite;
+    }
+
+    /* Sparkle Animations */
+    .floating-sparkle {
+        position: absolute;
+        font-size: 1.5rem;
+        animation: float-random 4s ease-in-out infinite;
+    }
+
+    .delay-2 { animation-delay: 2s; }
+    .delay-4 { animation-delay: 4s; }
+
+    @keyframes float-random {
+        0% { transform: translate(0, 0) rotate(0deg); }
+        50% { transform: translate(20px, -20px) rotate(180deg); }
+        100% { transform: translate(0, 0) rotate(360deg); }
+    }
+
+    /* Enhanced Filter Buttons */
+    .filter-btn {
+        padding: 0.5rem 1.5rem;
+        border-radius: 9999px;
+        background: linear-gradient(45deg, #FF99CC, #FFB6C1);
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        box-shadow: 0 4px 15px rgba(255, 105, 180, 0.2);
+    }
+
+    .filter-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 105, 180, 0.3);
+    }
+
+    .filter-btn.active {
         background: linear-gradient(45deg, #FF1493, #FF69B4);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 6px 20px rgba(255, 20, 147, 0.3);
     }
 
+    /* Elegant Tags */
+    .tag {
+        padding: 0.5rem 1rem;
+        border-radius: 9999px;
+        background: linear-gradient(45deg, #FFE5EE, #FFF0F5);
+        color: #FF69B4;
+        font-size: 0.75rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .tag:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(255, 105, 180, 0.15);
+    }
+
+    /* Heart Button Animation */
+    .heart-btn {
+        width: 40px;
+        height: 40px;
+        background: #FFF0F5;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #FF69B4;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .heart-btn:hover {
+        transform: scale(1.1);
+        background: #FFE4E1;
+    }
+
+    .heart-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* Comment Form Styling */
+    .comment-form input {
+        width: 100%;
+        padding: 0.75rem 3rem 0.75rem 1rem;
+        border-radius: 9999px;
+        border: 2px solid #FFE4E1;
+        transition: all 0.3s ease;
+    }
+
+    .comment-form input:focus {
+        outline: none;
+        border-color: #FF69B4;
+        box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.1);
+    }
+
+    /* Loading Animation */
     .gallery-item {
-        animation: fadeIn 0.6s ease-out backwards;
+        opacity: 0;
+        animation: fadeInUp 0.6s ease forwards;
     }
 
-    @keyframes fadeIn {
+    @keyframes fadeInUp {
         from {
             opacity: 0;
             transform: translateY(20px);
@@ -79,6 +243,7 @@
         }
     }
 
+    /* Staggered Animation Delay */
     /* Fixed stagger animation for gallery items */
     .gallery-item:nth-child(1) { animation-delay: 0.1s; }
     .gallery-item:nth-child(2) { animation-delay: 0.2s; }
@@ -90,43 +255,23 @@
     .gallery-item:nth-child(8) { animation-delay: 0.8s; }
     .gallery-item:nth-child(9) { animation-delay: 0.9s; }
     .gallery-item:nth-child(n+10) { animation-delay: 1s; }
-
-    /* Shimmer effect for headings */
-    .logo-text {
-        position: relative;
-        overflow: hidden;
-    }
-
-    .logo-text::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 50%;
-        height: 100%;
-        background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(255, 255, 255, 0.3),
-            transparent
-        );
-        animation: shimmer 2s infinite;
-    }
-
-    @keyframes shimmer {
-        100% {
-            left: 200%;
-        }
-    }
-
-    /* Hover animations for gallery items */
-    .gallery-item {
-        transition: all 0.3s ease;
-    }
-
-    .gallery-item:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    }
 </style>
+
+<script>
+    // Smooth scroll animation for filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+
+    // Heart button animation
+    document.querySelectorAll('.heart-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.classList.add('clicked');
+            setTimeout(() => this.classList.remove('clicked'), 300);
+        });
+    });
+</script>
 {% endblock %}

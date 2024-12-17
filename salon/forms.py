@@ -65,3 +65,15 @@ class AppointmentUpdateForm(forms.ModelForm):
             raise forms.ValidationError("The selected time is outside of salon operating hours (10:00 AM - 10:00 PM).")
 
         return date_time
+
+
+from django import forms
+from .models import GalleryComment
+
+class GalleryCommentForm(forms.ModelForm):
+    class Meta:
+        model = GalleryComment
+        fields = ['comment']
+        widgets = {
+            'comment': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Add a comment...'}),
+        }

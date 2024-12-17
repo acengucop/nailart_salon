@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.db.models import Sum
 from .models import UserProfile, Service, Appointment, DesignGallery, Category
+from .models import GalleryComment
+
 
 
 @admin.register(UserProfile)
@@ -73,3 +75,10 @@ class DesignGalleryAdmin(admin.ModelAdmin):
 class CategoryAdmin(admin.ModelAdmin):
     """Admin untuk model Category."""
     list_display = ('name',)
+
+
+@admin.register(GalleryComment)
+class GalleryCommentAdmin(admin.ModelAdmin):
+    list_display = ('gallery', 'user', 'created_at', 'comment')
+    search_fields = ('user__username', 'gallery__title', 'comment')
+    list_filter = ('created_at',)

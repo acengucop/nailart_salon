@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Appointments</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(135deg, #FFF5F6 0%, #FFE4E8 100%);
+            overflow-x: hidden;
+        }
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid rgba(255, 192, 203, 0.3);
+        }
+        .header a {
+            color: #FF69B4;
+            font-weight: 600;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+        .header a:hover {
+            color: #FF1493;
+            transform: translateY(-2px);
+        }
+        .footer {
+            background: linear-gradient(to right, #FF99CC, #FFB6C1);
+        }
+        .animated-table tbody tr {
+            transition: all 0.3s ease-in-out;
+        }
+        .animated-table tbody tr:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 248, 250, 0.9);
+        }
+        .fancy-button {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(90deg, #FF69B4, #FF1493);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 0.5rem 1.25rem;
+            font-weight: bold;
+            transition: all 0.3s;
+            z-index: 1;
+        }
+        .fancy-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: skewX(-25deg);
+            transition: all 0.5s;
+            z-index: -1;
+        }
+        .fancy-button:hover::before {
+            left: 100%;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <!-- Header -->
+    <header class="header shadow-lg">
+        <nav class="container mx-auto p-4 flex justify-between items-center">
+            <a href="/" class="text-3xl font-bold text-pink-500">Nail Paradise</a>
+            <div class="hidden md:flex space-x-6">
+                <a href="/" class="text-pink-600">🏠 Home</a>
+                <a href="/gallery/" class="text-pink-600">🎨 Gallery</a>
+                <a href="{% url 'admin_appointments' %}" class="text-pink-600">🛠 Manage Appointments</a>
+                <a href="{% url 'add_service' %}" class="text-pink-600">➕ Add Service</a>
+                <a href="{% url 'add_gallery' %}" class="text-pink-600">🖼 Add Gallery</a>
+                <a href="/profile" class="text-pink-600">👤 Profile</a>
+                <form action="{% url 'logout' %}" method="post" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" class="text-pink-600">🚪 Logout</button>
+                </form>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-6 flex-grow">
+        <h1 class="text-4xl font-extrabold mb-6 text-pink-600">Manage Appointments</h1>
+        <table class="animated-table table-auto w-full border-collapse border border-gray-200">
+            <thead>
+                <tr class="bg-pink-200 text-white">
+                    <th class="border p-3">User</th>
+                    <th class="border p-3">Service</th>
+                    <th class="border p-3">Date & Time</th>
+                    <th class="border p-3">Status</th>
+                    <th class="border p-3">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appointment in appointments %}
+                <tr>
+                    <td class="border p-3">{{ appointment.user.username }}</td>
+                    <td class="border p-3">{{ appointment.service.name }}</td>
+                    <td class="border p-3">{{ appointment.date_time }}</td>
+                    <td class="border p-3">{{ appointment.status }}</td>
+                    <td class="border p-3">
+                        <form method="post" action="">
+                            {% csrf_token %}
+                            <input type="hidden" name="appointment_id" value="{{ appointment.id }}">
+                            <button type="submit" name="status" value="Approved" class="fancy-button">Approve</button>
+                            <button type="submit" name="status" value="Rejected" class="fancy-button bg-red-500 hover:bg-red-600">Reject</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center p-4">No appointments found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer text-white py-4">
+        <div class="container mx-auto text-center">
+            <p>Made with ❤️ | &copy; 2024 Nail Paradise</p>
+        </div>
+    </footer>
+</body>
+</html>

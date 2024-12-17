@@ -24,10 +24,30 @@ class ServiceListView(ListView):
     template_name = 'salon/services.html'
 
 
+from django.shortcuts import redirect
+from .forms import GalleryCommentForm
+from .models import DesignGallery, GalleryComment
+
 class DesignGalleryListView(ListView):
-    """Menampilkan galeri desain."""
     model = DesignGallery
     template_name = 'salon/gallery.html'
+    context_object_name = 'object_list'
+
+    def post(self, request, *args, **kwargs):
+        form = GalleryCommentForm(request.POST)
+        if form.is_valid():
+            gallery_id = request.POST.get('gallery_id')
+            gallery = DesignGallery.objects.get(id=gallery_id)
+            form.instance.user = request.user
+            form.instance.gallery = gallery
+            form.save()
+        return redirect('gallery')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['comment_form'] = GalleryCommentForm()
+        return context
+
 
 
 class AppointmentCreateView(LoginRequiredMixin, CreateView):
@@ -163,3 +183,58 @@ class RegisterView(CreateView):
     template_name = 'salon/register.html'
     form_class = UserCreationForm
     success_url = reverse_lazy('login')
+
+from django.views.generic import ListView, CreateView, UpdateView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.urls import reverse_lazy
+from .models import Appointment, Service, DesignGallery
+
+# Admin can see and update appointments
+from django.shortcuts import redirect
+from django.views.generic import ListView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from .models import Appointment
+
+class AdminAppointmentListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    model = Appointment
+    template_name = 'admin/appointments_list.html'
+    context_object_name = 'appointments'
+
+    def test_func(self):
+        return self.request.user.is_staff  # Hanya admin yang dapat mengakses
+
+    def post(self, request, *args, **kwargs):
+        appointment_id = request.POST.get('appointment_id')
+        new_status = request.POST.get('status')
+
+        if appointment_id and new_status in ['Approved', 'Rejected']:
+            try:
+                appointment = Appointment.objects.get(pk=appointment_id)
+                appointment.status = new_status
+                appointment.save()
+                self.success_message = f"Appointment status changed to {new_status}."
+            except Appointment.DoesNotExist:
+                self.error_message = "Appointment does not exist."
+        
+        return redirect('admin_appointments')  # Redirect kembali ke halaman yang sama
+
+
+# Admin can add a new service
+class AdminServiceCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = Service
+    fields = ['name', 'price', 'duration', 'image']
+    template_name = 'admin/add_service.html'
+    success_url = reverse_lazy('home')
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+# Admin can add a new image to gallery
+class AdminGalleryCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = DesignGallery
+    fields = ['title', 'description', 'image']
+    template_name = 'admin/add_gallery.html'
+    success_url = reverse_lazy('gallery')
+
+    def test_func(self):
+        return self.request.user.is_staff
