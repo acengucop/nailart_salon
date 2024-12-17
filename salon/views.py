@@ -49,6 +49,33 @@ class DesignGalleryListView(ListView):
         return context
 
 
+from datetime import timedelta
+from django.utils.timezone import now, localtime
+from .models import Appointment
+
+def get_available_slots_for_today():
+    """
+    Mengambil slot yang tersedia untuk hari ini setiap 30 menit,
+    dimulai dari jam buka (10:00) sampai jam tutup (22:00).
+    """
+    current_time = localtime(now())
+    opening_time = current_time.replace(hour=10, minute=0, second=0, microsecond=0)
+    closing_time = current_time.replace(hour=22, minute=0, second=0, microsecond=0)
+
+    booked_slots = Appointment.objects.filter(
+        date_time__date=current_time.date()
+    ).values_list('date_time', flat=True)
+
+    slots = []
+    slot_time = opening_time
+    while slot_time < closing_time:
+        if slot_time not in booked_slots and slot_time >= current_time:
+            slots.append(slot_time)
+        slot_time += timedelta(minutes=30)
+
+    return slots
+
+
 
 class AppointmentCreateView(LoginRequiredMixin, CreateView):
     """Membuat appointment baru."""
@@ -112,6 +139,9 @@ class UserAppointmentListView(LoginRequiredMixin, ListView):
         return Appointment.objects.filter(user=self.request.user).order_by('-date_time')
 
 
+from django.contrib import messages
+from django.shortcuts import redirect
+
 class AppointmentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """Mengupdate appointment user."""
     model = Appointment
@@ -120,9 +150,22 @@ class AppointmentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView)
     success_url = reverse_lazy('user_appointments')
 
     def test_func(self):
-        return self.request.user == self.get_object().user
+        appointment = self.get_object()
+        # Hanya user pemilik dan appointment yang belum di-approve
+        return self.request.user == appointment.user and appointment.status != 'Approved'
+
+    def handle_no_permission(self):
+        messages.error(self.request, "You cannot edit an approved appointment.")
+        return redirect('user_appointments')
 
     def form_valid(self, form):
+        appointment = self.get_object()
+
+        # Validasi tambahan jika status appointment berubah di luar kontrol
+        if appointment.status == 'Approved':
+            messages.error(self.request, "You cannot edit an approved appointment.")
+            return redirect('user_appointments')
+
         # Validasi jam operasional
         date_time = form.instance.date_time
         opening_time = date_time.replace(hour=10, minute=0, second=0, microsecond=0)
@@ -140,6 +183,10 @@ class AppointmentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView)
         return super().form_valid(form)
 
 
+
+from django.contrib import messages
+from django.shortcuts import redirect
+
 class AppointmentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """Menghapus appointment user."""
     model = Appointment
@@ -147,30 +194,25 @@ class AppointmentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView)
     success_url = reverse_lazy('user_appointments')
 
     def test_func(self):
-        return self.request.user == self.get_object().user
+        appointment = self.get_object()
+        # Hanya user pemilik appointment dan status bukan 'Approved'
+        return self.request.user == appointment.user and appointment.status != 'Approved'
 
+    def handle_no_permission(self):
+        messages.error(self.request, "You cannot delete an approved appointment.")
+        return redirect('user_appointments')
 
-def get_available_slots_for_today():
-    """
-    Mengambil slot yang tersedia untuk hari ini setiap 30 menit,
-    dimulai dari jam buka (10:00) sampai jam tutup (22:00).
-    """
-    current_time = localtime(now())
-    opening_time = current_time.replace(hour=10, minute=0, second=0, microsecond=0)
-    closing_time = current_time.replace(hour=22, minute=0, second=0, microsecond=0)
+    def delete(self, request, *args, **kwargs):
+        appointment = self.get_object()
 
-    booked_slots = Appointment.objects.filter(
-        date_time__date=current_time.date()
-    ).values_list('date_time', flat=True)
+        # Validasi tambahan saat proses delete
+        if appointment.status == 'Approved':
+            messages.error(request, "You cannot delete an approved appointment.")
+            return redirect('user_appointments')
 
-    slots = []
-    slot_time = opening_time
-    while slot_time < closing_time:
-        if slot_time not in booked_slots and slot_time >= current_time:
-            slots.append(slot_time)
-        slot_time += timedelta(minutes=30)
+        messages.success(request, "Appointment has been successfully deleted.")
+        return super().delete(request, *args, **kwargs)
 
-    return slots
 
 
 class CustomLogoutView(LogoutView):
@@ -190,7 +232,9 @@ from django.urls import reverse_lazy
 from .models import Appointment, Service, DesignGallery
 
 # Admin can see and update appointments
+from django.contrib import messages
 from django.shortcuts import redirect
+from django.urls import reverse_lazy
 from django.views.generic import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Appointment
@@ -206,17 +250,28 @@ class AdminAppointmentListView(LoginRequiredMixin, UserPassesTestMixin, ListView
     def post(self, request, *args, **kwargs):
         appointment_id = request.POST.get('appointment_id')
         new_status = request.POST.get('status')
+        action = request.POST.get('action')  # Tambahkan action untuk delete
 
-        if appointment_id and new_status in ['Approved', 'Rejected']:
+        if appointment_id:
             try:
                 appointment = Appointment.objects.get(pk=appointment_id)
-                appointment.status = new_status
-                appointment.save()
-                self.success_message = f"Appointment status changed to {new_status}."
+
+                # Aksi untuk mengubah status
+                if new_status in ['Approved', 'Rejected']:
+                    appointment.status = new_status
+                    appointment.save()
+                    messages.success(request, f"Appointment status changed to {new_status}.")
+
+                # Aksi untuk menghapus appointment
+                elif action == 'delete':
+                    appointment.delete()
+                    messages.success(request, "Appointment has been successfully deleted.")
+
             except Appointment.DoesNotExist:
-                self.error_message = "Appointment does not exist."
+                messages.error(request, "Appointment does not exist.")
         
         return redirect('admin_appointments')  # Redirect kembali ke halaman yang sama
+
 
 
 # Admin can add a new service

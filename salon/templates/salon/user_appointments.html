@@ -48,19 +48,26 @@
                     </div>
 
                     <!-- Actions -->
-                    <div class="md:col-span-1 flex justify-end space-x-3">
-                        <a href="{% url 'edit_appointment' appointment.id %}" 
-                           class="action-button edit-button">
-                            <i class="fas fa-edit mr-2"></i>
-                            Edit
-                        </a>
-                        <a href="{% url 'delete_appointment' appointment.id %}" 
-                           class="action-button delete-button">
-                            <i class="fas fa-trash-alt mr-2"></i>
-                            Delete
-                        </a>
-                    </div>
-                </div>
+<!-- Actions -->
+<div class="md:col-span-1 flex justify-end space-x-3">
+    {% if appointment.status != 'Approved' %}
+        <a href="{% url 'edit_appointment' appointment.id %}" 
+           class="action-button edit-button">
+            <i class="fas fa-edit mr-2"></i>
+            Edit
+        </a>
+        <a href="{% url 'delete_appointment' appointment.id %}" 
+           class="action-button delete-button">
+            <i class="fas fa-trash-alt mr-2"></i>
+            Delete
+        </a>
+    {% else %}
+        <span class="text-green-600 font-semibold text-sm">
+            Approved - Cannot Edit/Delete
+        </span>
+    {% endif %}
+</div>
+
 
                 <!-- Progress Bar -->
                 <div class="h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 progress-bar"></div>

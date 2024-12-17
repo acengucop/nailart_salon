@@ -111,10 +111,20 @@
                         <form method="post" action="">
                             {% csrf_token %}
                             <input type="hidden" name="appointment_id" value="{{ appointment.id }}">
+                    
+                            <!-- Approve Button -->
                             <button type="submit" name="status" value="Approved" class="fancy-button">Approve</button>
+                    
+                            <!-- Reject Button -->
                             <button type="submit" name="status" value="Rejected" class="fancy-button bg-red-500 hover:bg-red-600">Reject</button>
+                    
+                            <!-- Delete Button -->
+                            <button type="submit" name="action" value="delete" class="fancy-button bg-gray-500 hover:bg-gray-600">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </button>
                         </form>
                     </td>
+                    
                 </tr>
                 {% empty %}
                 <tr>
